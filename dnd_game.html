@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DND game</title>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script src="jquery-ui.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .content {
+            margin: 80px 70px;
+        }
+
+        .cardPile {
+            background-color: #ffd;
+        }
+
+        .cardSlots {
+            background-color: #ddf;
+        }
+
+        .cardPile, .cardSlots {
+            display: flex;
+            flex-wrap: wrap;
+            width: 80%;
+            min-height: 200px;
+            margin: 60px auto;
+            border: 2px solid black;
+            padding: 2px;
+        }
+
+        .cardPile div, .cardSlots div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1 0 10%;
+            user-select: none;
+            border: 1px solid black;
+        }
+
+        .cardPile div {
+            background-color: darkgrey;
+            color: white;
+            font-size: 3em;
+            text-shadow: 0 0 3px #000;
+            /*line-height: 200px;*/
+        }
+
+        .success {
+            background-color: forestgreen !important;
+        }
+
+        .winModal {
+            display: none;
+            border: 1px solid black;
+            width: 60%;
+            position: fixed;
+            left: 20%;
+            top: 20%;
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+<div id="content" class="content">
+    <div id="cardPile" class="cardPile"></div>
+    <div id="cardSlots" class="cardSlots"></div>
+</div>
+<div id="winModal" class="winModal">
+    <h2>Победа!</h2>
+    <button onclick="document.location.reload()">Сыграть еще раз!</button>
+</div>
+
+<script>
+    $(function () {
+        const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+        const words = ["один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять"];
+        let correctCards = 0;
+        let mistakes = 3;
+
+        // перетасуем числа случайным образом
+        numbers.sort(() => Math.random() - 0.5);
+
+        // заполнение cardPile - Верхнего блока с карточками
+        for (let i = 0; i < numbers.length; i++) {
+            $(`<div><span>${numbers[i]}</span></div>`)
+                .data('number', numbers[i])
+                .appendTo('#cardPile')
+                .draggable({
+                        containment: '#content',
+                        revert: true,
+                        cursor: 'move',
+                        // start: function () {
+                        //     alert($(this).data('number'));
+                        // }
+                    }
+                );
+        }
+
+        // исчезание элементов через 4 сек.
+        $('#cardPile > div > span').delay(4000).fadeOut(1000);
+
+        // заполнение cardSlots
+        for (let j = 0; j < words.length;) {
+            $(`<div><span>${words[j]}</span></div>`)
+                .data('number', ++j)
+                .appendTo('#cardSlots')
+                .droppable({
+                    accept: '#cardPile div',
+                    drop: handleCardDrop
+                });
+        }
+
+        function handleCardDrop(event, ui) {
+            // слот в который мы переносим карточку и записываем номер слота
+            let slotNumber = $(this).data('number');
+            // берем номер(data) перетаскиваемой карточки
+            let cardNumber = ui.draggable.data('number');
+            // console.log(`${cardNumber} в ${slotNumber}`);
+
+            if (slotNumber === cardNumber) {
+                // отключает возможность перемещения элемента
+                ui.draggable.draggable('disable');
+                // отключаем revert для перемещаемогоэлемента
+                ui.draggable.draggable('option', 'revert', false);
+
+                // фиксируем карточку к левому верхнему углу слота
+                ui.draggable.position({
+                    of: this,
+                    my: 'left top',
+                    at: 'left top'
+                });
+
+                // добавляем класс для карточки попавшей в нужный слот
+                ui.draggable.addClass('success');
+
+                ++correctCards === 10 && $('#winModal').fadeIn(1500);
+            } else {
+                --mistakes === 0 && $('#winModal').fadeIn(1500);
+            }
+        }
+    });
+</script>
+</body>
+</html>
