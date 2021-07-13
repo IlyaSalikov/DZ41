@@ -12,6 +12,7 @@
 
         .content {
             margin: 80px 70px;
+            background-image: url("casino-chips-and-cards.jpg");/*Оформить игру в своем стиле вместе с модальным окном*/
         }
 
         .cardPile {
@@ -19,7 +20,7 @@
         }
 
         .cardSlots {
-            background-color: #ddf;
+            background-color: rgb(119, 124, 232);
         }
 
         .cardPile, .cardSlots {
@@ -61,6 +62,7 @@
             left: 20%;
             top: 20%;
             background-color: lightgreen;
+            text-align: center;/*Оформить игру в своем стиле вместе с модальным окном*/
         }
     </style>
 </head>
@@ -77,7 +79,7 @@
 <script>
     $(function () {
         const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-        const words = ["один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять", "десять"];
+        const words = ["Один", "Два", "Три", "Четыре", "Пять", "Шесть", "Семь", "Восемь", "Девять", "Десять"];
         let correctCards = 0;
         let mistakes = 3;
 
@@ -137,12 +139,16 @@
                 // добавляем класс для карточки попавшей в нужный слот
                 ui.draggable.addClass('success');
 
+//1) Добавить одно общее модальное окно, которое будет выводиться при проигрыше или победе игрока с соответствующим текстом.
                 ++correctCards === 10 && $('#winModal').fadeIn(1500);
             } else {
                 --mistakes === 0 && $('#winModal').fadeIn(1500);
+                $('#winModal h2').html('Поражение!');
+                $('.winModal').css({'background-color':'red'});/*Оформить игру в своем стиле вместе с модальным окном*/
             }
         }
     });
+    //3) При перетаскивании карточки в нужный слот делать номер этой карточки видимым. нет ответа
 </script>
 </body>
 </html>
